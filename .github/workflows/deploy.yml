@@ -1,0 +1,33 @@
+name: payments_deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create .env
+        run: |
+          echo "DB_HOST=mysql_payments" > .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_NAME=labo05_payments_db" >> .env
+          echo "DB_USER=labo05" >> .env
+          echo "DB_PASSWORD=labo05" >> .env
+
+      - name: Stop previous containers
+        run: |
+          docker compose down || true
+
+      - name: Build images
+        run: |
+          docker compose build
+
+      - name: Start containers
+        run: |
+          docker compose up -d
