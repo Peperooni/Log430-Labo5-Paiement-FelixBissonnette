@@ -43,7 +43,7 @@ def update_status_to_paid(payment_id: int):
         # Update the payment status
         payment.is_paid = True
         session.commit()
-        
+
         return {
             "payment_id": payment_id,
             "order_id": payment.order_id,

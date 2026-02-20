@@ -8,6 +8,7 @@ import requests
 from logger import Logger
 from commands.write_payment import create_payment, update_status_to_paid
 from queries.read_payment import get_payment_by_id
+import config
 
 logger = Logger.get_instance("payment")
 
@@ -41,8 +42,8 @@ def process_payment(payment_id, credit_card_data):
         "payment_id": update_result["payment_id"],
         "is_paid": update_result["is_paid"]
     }
-    # TODO: appelez la méthode correctement
-    update_order(0, False)
+
+    update_order(result["order_id"], result["is_paid"])
 
     return result
     
@@ -54,4 +55,10 @@ def _process_credit_card_payment(payment_data):
 
 def update_order(order_id, is_paid):
     """ Trigger order update once it is paid"""
-    pass
+    logger.debug("Update de la commande : order_id")
+    order_update = {"order_id": order_id, "is_paid":is_paid}
+    
+    requests.put(f'http://{config.API_GATEWAY}:8080/store-manager-api/orders',
+      json=order_update,
+      headers={'Content-Type': 'application/json'}
+    )
